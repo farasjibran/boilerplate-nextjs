@@ -18,15 +18,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Copy environment
         run: cp .env.example .env.local
+      - name: Prisma generate
+        run: npx prisma generate
       - name: Lint
         run: npm run lint
       - name: Type check
         run: npm run typecheck
       - name: Test
-        run: npm run test
+        run: npm run test -- --coverage
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.node-version }}
+          path: coverage/
+          retention-days: 7
       - name: Build
         run: npm run build
+      - name: Security audit
+        run: npm audit --audit-level=moderate || true
+      - name: Cache cleanup
+        if: always()
+        run: |
+          rm -rf .next/cache
+          npm cache clean --force

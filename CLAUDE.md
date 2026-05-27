@@ -1,130 +1,171 @@
 # Boilerplate Next.js — Claude Code Configuration
 
-> **Status**: Pre-implementation (PRD approved, belum ada codebase).
-> File ini akan auto-update setelah boilerplate di-generate.
+> **Status**: Phase 2 in progress (Auth + Database + Sentry). Phase 1 complete.
 
 ## Tech Stack
-[dari: PRD.md — Section 11 & 21]
-- **Backend**: Next.js App Router (TypeScript strict)
-- **Frontend**: React (Server Components default)
-- **Styling**: Tailwind CSS + `clsx` + `tailwind-merge`
-- **Validation**: Zod
+- **Backend**: Next.js 15 App Router (TypeScript strict)
+- **Frontend**: React 19 (Server Components default)
+- **Styling**: Tailwind CSS 4 + `clsx` + `tailwind-merge`
+- **Validation**: Zod 3
 - **Forms**: React Hook Form
-- **Testing**: Vitest + Testing Library (Playwright optional)
-- **Lint/Format**: ESLint + Prettier + `eslint-config-next`
-- **Database**: Belum ada (Prisma/Drizzle optional-ready, v1 tidak wajib)
-- **Auth**: Belum ada (Auth.js/Clerk/Supabase Auth optional-ready, v1 tidak wajib)
+- **Auth**: Auth.js v5 (NextAuth beta) + GitHub + Credentials
+- **Database**: PostgreSQL + Prisma 6
+- **Observability**: Sentry 10
+- **Testing**: Vitest 4 + Testing Library (Playwright optional)
+- **Lint/Format**: ESLint 9 + Prettier 3 + `eslint-config-next`
 - **Package Manager**: npm
 
 ## Core Libraries
-[dari: PRD.md — Section 11]
-- **next** (terbaru stabil) — App Router framework
-- **react** + **react-dom** — UI library
-- **typescript** — strict mode
-- **tailwindcss** — utility-first CSS
-- **zod** — runtime type validation & schema
-- **react-hook-form** — form state & validation
-- **clsx** + **tailwind-merge** — conditional class helper
-- **eslint** + **prettier** + **eslint-config-next** — code quality
-- **vitest** + **@testing-library/react** — unit/component testing
-- **@playwright/test** (optional) — E2E testing
+- **next** 15.2.4 — App Router framework
+- **react** 19 + **react-dom** 19 — UI library
+- **typescript** 5.7.3 — strict mode
+- **tailwindcss** 4.0.9 — utility-first CSS
+- **zod** 3.24.2 — runtime type validation & schema
+- **react-hook-form** 7.54.2 — form state & validation
+- **next-auth** 5.0.0-beta.25 — authentication (Auth.js v5)
+- **@prisma/client** 6.5.0 — database ORM
+- **@sentry/nextjs** 10 — error tracking + performance
+- **clsx** 2.1.1 + **tailwind-merge** 3.0.2 — conditional class helper
+- **eslint** 9.20.1 + **prettier** 3.5.2 + **eslint-config-next** 15.2.4
+- **vitest** 3.0.5 + **@testing-library/react** 16.2.0 — testing
+- **tsx** 4.22.3 — TypeScript execution for seed/scripts
 
 ## Perintah Penting
-[dari: PRD.md — Section 9.17 & 19]
 ```bash
-npm run dev          # Start dev server
-npm run build        # Production build
-npm run lint         # ESLint check
-npm run typecheck    # tsc --noEmit
-npm run test         # Vitest run
-npm run check        # Aggregate: lint + typecheck + test
+npm run dev             # Start dev server
+npm run build           # Production build
+npm run lint            # ESLint check
+npm run typecheck       # tsc --noEmit
+npm run test            # Vitest run
+npm run check           # Aggregate: lint + typecheck + test
+npm run prisma:generate # Generate Prisma client
+npm run prisma:migrate  # Run migrations (dev)
+npm run prisma:seed     # Seed database
+npm run prisma:studio   # Open Prisma Studio
 ```
 
 ## Struktur Direktori
-[dari: PRD.md — Section 9.3]
 ```
 src/
   app/                    # Next.js App Router
     (marketing)/          # Route group: publik
     (dashboard)/          # Route group: auth-required
-    api/                  # API routes
+    api/                  # API routes + Auth.js handler
+    notes/                # Notes feature pages
   components/
-    ui/                   # Generic: Button, Input, Card, EmptyState, ErrorState
-    shared/               # Cross-feature reusable
-    feature/              # Feature-specific (naik ke shared bila dipakai 2+ fitur)
+    ui/                   # Generic: Button, Input, Card, dll
+    shared/               # Cross-feature reusable (AuthProvider)
+    feature/              # Feature-specific
   features/               # Feature-based modules
-    <feature-name>/
-      components/         # UI khusus fitur
-      actions/            # Server actions / mutations (*.action.ts)
-      queries/            # Read operations (*.query.ts)
-      schemas/            # Zod validation (*.schema.ts)
-      types/              # TypeScript types (*.types.ts)
-      utils/              # Helper lokal fitur
-      __tests__/          # Test files
-  lib/
-    env/                  # Environment parsing/validation
-    fetchers/             # Fetch wrapper standar
-    utils/                # General utility (cn(), format, dll)
-    constants/            # App-wide constants
+    notes/                # Canonical example feature
+      types/              # TypeScript types
+      schemas/            # Zod validation
+      lib/                # Feature utilities (Prisma queries)
+      queries/            # Read operations
+      actions/            # Server actions (mutations)
+      components/         # Feature UI
+      __tests__/          # Tests
+  lib/                    # Core libraries
+    env/                  # Environment validation
+    fetchers/             # Fetch wrapper
+    utils/                # cn() helper
     errors/               # Custom error classes
-  services/               # Business logic layer (API integration, external deps)
-  hooks/                  # Custom React hooks (use-*.ts)
+    auth/                 # Auth.js config
+    db.ts                 # Prisma singleton
+    logger.ts             # Structured JSON logger
+  middleware.ts           # Route protection (Auth.js)
   styles/                 # Global CSS, Tailwind config
-  types/                  # Global TypeScript types
-  tests/                  # Test utilities, fixtures
-  docs/                   # Arsitektur, konvensi, template
+  tests/                  # Test utilities
+prisma/
+  schema.prisma           # Database schema
+  seed.ts                 # Seed data
+sentry.*.config.ts        # Sentry client/server/edge configs
 ```
 
 ## Module Map
-**Belum ada modul — project belum di-generate.**
-Akan diisi setelah Phase 1 implementasi selesai.
 
-**Hub modules**: Belum ada.
-**Feature example**: Akan ada 1 canonical feature (todo/notes/bookmarks) sebagai referensi.
+### `src/lib/` — Core Utilities
+- **db.ts** — Prisma singleton dengan dev-mode connection pooling guard
+- **auth/index.ts** — Auth.js v5 config (GitHub + Credentials providers)
+- **env/index.ts** — Zod schema untuk semua env vars
+- **errors/index.ts** — AppError, ValidationError, NotFoundError, dll
+- **fetchers/index.ts** — `apiFetch<T>()` dengan error normalization
+- **logger.ts** — JSON structured logging (level, timestamp, message, context)
+- **utils.ts** — `cn()` helper (clsx + tailwind-merge)
+
+### `src/features/notes/` — Notes Feature (CRUD)
+Business flow: Buat catatan → List → Detail → Edit → Hapus. Phase 2: migrate dari in-memory ke Prisma.
+- **types/index.ts** — Note, NoteCreateInput, NoteUpdateInput
+- **schemas/note.schema.ts** — createNoteSchema, updateNoteSchema (Zod)
+- **lib/store.ts** — In-memory store (akan diganti Prisma)
+- **queries/notes.query.ts** — getAllNotesQuery, getNoteByIdQuery
+- **actions/notes.action.ts** — createNoteAction, updateNoteAction, deleteNoteAction
+- **components/** — NoteForm, NoteCard, NoteList
+
+### `src/app/` — Routes
+- **`/`** — Landing page
+- **`/login`** — Login page (credentials + GitHub)
+- **`/notes`** — Notes list
+- **`/notes/new`** — Create note
+- **`/notes/[id]`** — Note detail
+- **`/notes/[id]/edit`** — Edit note
+- **`/api/auth/[...nextauth]`** — Auth.js handler
+- **`/api/sentry-example-api`** — Sentry test endpoint
+- **`/dashboard`** — Protected route (auth required)
 
 ## Database Conventions
-Belum ada database di v1. Jika ditambahkan nanti:
-- **ID strategy**: TBD (Prisma default atau UUID)
-- **Timestamps**: created_at + updated_at
-- **Soft delete**: TBD
-- **Naming**: snake_case untuk kolom
+- **ORM**: Prisma 6
+- **Database**: PostgreSQL
+- **ID strategy**: `cuid()` default
+- **Timestamps**: `createdAt` + `updatedAt` (auto)
+- **Soft delete**: Belum ada
+- **Naming**: snake_case untuk kolom (`@@map`)
+- **Relations**: Cascade delete untuk User → Notes
 
 ## API Patterns
-Belum ada API layer di v1. Conventions untuk future:
 - **Response format**: `{ status, data, message }` wrapper
-- **Pagination**: TBD
 - **API prefix**: `/api/` (App Router route handlers)
 - **Serialization**: Zod schema di input & output
-- **Error format**: Aman, tidak bocorkan detail internal
+- **Error format**: Custom error classes, tidak bocorkan detail internal
 
 ## Template & Layout
-[dari: PRD.md — Section 9.5 & 9.9]
-- **Root layout**: `src/app/layout.tsx` — metadata, fonts, global providers
+- **Root layout**: `src/app/layout.tsx` — Inter font, metadata, Indonesian lang
 - **Route groups**: `(marketing)`, `(dashboard)` untuk domain separation
-- **Each route**: `loading.tsx`, `error.tsx`, `not-found.tsx` bila relevan
+- **Each route**: `loading.tsx`, `error.tsx`, `not-found.tsx`
 - **UI convention**: Server Component default, `"use client"` hanya bila perlu interaktivitas
 
 ## Base Classes & Utilities
-Belum ada custom base classes. Akan ada:
-- `src/lib/utils.ts` — `cn()` helper (clsx + tailwind-merge)
-- `src/lib/env/` — environment validation (Zod schema)
-- `src/lib/errors/` — custom error classes (AppError, ValidationError)
-- `src/lib/fetchers/` — standardized fetch wrapper dengan error handling
+- `src/lib/utils.ts` — `cn()` helper
+- `src/lib/env/index.ts` — environment validation (Zod schema)
+- `src/lib/errors/index.ts` — AppError, ValidationError, NotFoundError, UnauthorizedError, ConflictError
+- `src/lib/fetchers/index.ts` — `apiFetch<T>()` with error normalization
+- `src/lib/db.ts` — Prisma singleton (dev connection pooling guard)
+- `src/lib/logger.ts` — JSON structured logger
 
 ## Shared UI Components
-Belum ada. Akan ada di `src/components/ui/`:
-- Button, Input, Card, EmptyState, ErrorState, Skeleton, LoadingState
+- `src/components/ui/button.tsx` — primary/secondary/ghost/destructive variants
+- `src/components/ui/input.tsx` — error display, a11y
+- `src/components/ui/card.tsx` — Card, CardHeader, CardTitle, CardContent
+- `src/components/ui/empty-state.tsx` — title, desc, optional icon/action (href-based)
+- `src/components/ui/error-state.tsx` — title, message, retry button
+- `src/components/ui/loading-state.tsx` — spinner + message
+- `src/components/shared/AuthProvider.tsx` — SessionProvider wrapper
 
 ## Integration Points
-Belum ada. Setelah generate:
 - **Sidebar/navigation**: `src/components/shared/`
+- **Protected routes**: `src/middleware.ts` — `/dashboard` group requires auth
+- **Auth flow**: `/login` → callbackUrl redirect
 - **URL registration**: `src/app/` route structure
 - **API registration**: `src/app/api/`
 
 ## Auth & Session
-**Auth belum dikonfigurasi** (masuk v1.1/Phase 2).
-- Struktur siap integrasi NextAuth/Clerk/Supabase Auth
-- Protected route convention akan didokumentasikan di `docs/conventions.md`
+- **Provider**: Auth.js v5 (next-auth@beta)
+- **Strategy**: Database sessions (Prisma adapter)
+- **Providers**: GitHub OAuth + Credentials (placeholder)
+- **Session**: Database-backed (sessions table)
+- **Key middleware**: `src/middleware.ts` — protected `/dashboard` routes
+- **Login URL**: `/login`
+- **Server session**: `auth()` from `@/lib/auth`
 
 ## Signals & Events
 Tidak ada signals/events.
@@ -190,7 +231,6 @@ Lihat skill `coding-standards` untuk aturan lengkap. Highlights:
 - Bahasa Indonesia untuk komunikasi, English untuk kode
 
 ### Naming Convention
-[dari: PRD.md — Section 23]
 - file util: `kebab-case.ts`
 - component: `PascalCase.tsx`
 - hooks: `use-*.ts`
@@ -200,7 +240,6 @@ Lihat skill `coding-standards` untuk aturan lengkap. Highlights:
 - queries: `*.query.ts`
 
 ### Coding Rules
-[dari: PRD.md — Section 23]
 - Default ke Server Component
 - Tambahkan `"use client"` hanya jika perlu interaktivitas/browser API
 - Validation schema dekat dengan feature
@@ -214,7 +253,6 @@ Lihat skill `coding-standards` untuk aturan lengkap. Highlights:
 Belum ada custom agents — gunakan default agents.
 
 ### Skills
-Skill global tersedia di `~/.claude/skills/` dan project `.claude/skills/`:
 - `coding-standards` — standar kualitas kode wajib
 - `nextjs-patterns` — pola Next.js 16 App Router
 - `typescript-guideline` — konvensi TypeScript strict mode
@@ -225,10 +263,10 @@ Skill global tersedia di `~/.claude/skills/` dan project `.claude/skills/`:
 - `security-auth-checklist` — checklist keamanan auth
 - `sop-plan` / `sop-plan-lengkap` — template implementation plan
 - `sop-devlog` — format devlog
-- `imp.*` — command suite (dev, bug, test, review, refactor, dll)
+- `imp.*` — command suite
 
 ### Commands
-- `/imp.dev` — Development command
+- `/imp.dev` — Development
 - `/imp.bug` — Bug investigation
 - `/imp.test` — Test coverage
 - `/imp.review` — Code review
@@ -236,9 +274,9 @@ Skill global tersedia di `~/.claude/skills/` dan project `.claude/skills/`:
 - `/imp.hotfix` — Hotfix
 - `/imp.security` — Security audit
 - `/imp.qa` — Quality assurance
-- `/imp.mr` — Generate MR title & description
+- `/imp.mr` — MR title & description
 - `/imp.ticket` — Format requirement ke tiket
 - `/imp.update` — Update konfigurasi .claude
 - `/imp.setup` — Generate CLAUDE.md
-- `/imp.help` — Panduan perintah
+- `/imp.help` — Panduan
 - `/imp.proof` — Formal correctness verification
