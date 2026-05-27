@@ -54,6 +54,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run prisma:migrate` | Run migrations (dev) |
 | `npm run prisma:seed` | Seed database |
 | `npm run prisma:studio` | Open Prisma Studio |
+| `npm run generate` | Scaffold new feature (CLI) |
 
 ## Project Structure
 
@@ -101,6 +102,18 @@ Sentry 10 untuk error tracking dan performance monitoring:
 - Server-side: `instrumentation.ts` (`register()`)
 - Global error handler: `src/app/global-error.tsx`
 - JSON structured logging: `src/lib/logger.ts`
+
+## Feature Generator
+
+Scaffold fitur baru tanpa copy-paste manual:
+
+```bash
+npm run generate tasks              # CRUD default
+npm run generate faqs --preset simple
+npm run generate bookmarks --preset protected --fields "title:string url:string"
+```
+
+Lihat `docs/generator.md` untuk detail presets dan options.
 
 ## How to Work with AI Agents
 
