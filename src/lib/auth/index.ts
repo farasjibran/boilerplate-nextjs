@@ -1,11 +1,9 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/db";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
+import type { NextAuthConfig } from "next-auth";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+const config: NextAuthConfig = {
   providers: [
     GitHub,
     Credentials({
@@ -30,6 +28,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
   },
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
-});
+};
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config);

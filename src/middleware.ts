@@ -1,10 +1,9 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isProtected = req.nextUrl.pathname.startsWith("/dashboard")
-    || req.nextUrl.pathname.startsWith("/(dashboard)");
+  const isProtected = req.nextUrl.pathname.startsWith("/dashboard");
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.url);
