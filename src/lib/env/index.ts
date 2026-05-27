@@ -11,7 +11,7 @@ const envSchema = z.object({
   AUTH_GITHUB_SECRET: z.string().optional(),
   AUTH_URL: z.string().url().optional(),
   DATABASE_URL: z.string().optional(),
-  SENTRY_DSN: z.string().url().optional(),
+  SENTRY_DSN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
