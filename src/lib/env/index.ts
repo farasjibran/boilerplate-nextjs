@@ -5,6 +5,13 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default("Boilerplate Next.js"),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
+  // Phase 2: Auth + Database + Sentry
+  AUTH_SECRET: z.string().optional(),
+  AUTH_GITHUB_ID: z.string().optional(),
+  AUTH_GITHUB_SECRET: z.string().optional(),
+  AUTH_URL: z.string().url().optional(),
+  DATABASE_URL: z.string().optional(),
+  SENTRY_DSN: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

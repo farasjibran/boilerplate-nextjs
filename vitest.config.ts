@@ -7,6 +7,12 @@ export default defineConfig({
     setupFiles: ["src/tests/setup.ts"],
     globals: true,
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "lcov"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/tests/**", ".next/**"],
+    },
   },
   esbuild: {
     jsx: "automatic",

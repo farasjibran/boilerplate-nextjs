@@ -77,3 +77,46 @@ try {
 - Max 30 baris per function
 - Max 88 karakter per baris
 - Jika melebihi → pecah ke file terpisah
+
+## Authentication
+
+### Protected Routes
+- Routes di `(dashboard)` group dilindungi middleware
+- Middleware cek session via `auth()` dari `@/lib/auth`
+- Redirect ke `/login` dengan `callbackUrl` jika belum login
+
+### Server-side Auth
+```typescript
+import { auth } from "@/lib/auth";
+const session = await auth();
+if (!session) redirect("/login");
+```
+
+### Client-side Auth
+```typescript
+import { useSession, signIn, signOut } from "next-auth/react";
+const { data: session } = useSession();
+```
+
+### Server Actions dengan Auth
+```typescript
+"use server";
+import { auth } from "@/lib/auth";
+const session = await auth();
+if (!session) throw new UnauthorizedError();
+```
+
+## Observability
+
+### Sentry Integration
+- Error di `error.tsx` otomatis capture ke Sentry
+- API route test: `GET /api/sentry-example-api`
+- Config: `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`
+
+### Structured Logging
+```typescript
+import { logger } from "@/lib/logger";
+logger.info("User created note", { userId: "abc", noteId: "xyz" });
+logger.error("Failed to save note", { error: e.message });
+```
+Output: JSON `{ level, timestamp, message, context }`
