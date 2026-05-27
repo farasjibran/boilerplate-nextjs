@@ -1,6 +1,6 @@
 # Boilerplate Next.js — Claude Code Configuration
 
-> **Status**: Phase 2 in progress (Auth + Database + Sentry). Phase 1 complete.
+> **Status**: Phase 3 in progress (CLI generator). Phase 1 + 2 complete.
 
 ## Tech Stack
 - **Backend**: Next.js 15 App Router (TypeScript strict)
@@ -42,6 +42,7 @@ npm run prisma:generate # Generate Prisma client
 npm run prisma:migrate  # Run migrations (dev)
 npm run prisma:seed     # Seed database
 npm run prisma:studio   # Open Prisma Studio
+npm run generate <name> # Scaffold new feature (CLI)
 ```
 
 ## Struktur Direktori
